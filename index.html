@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>QI QUEST — Science, logique et mémoire</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark;--bg:#07111f;--cd:#0f1f36;--ln:#1f3a5c;--ac:#2ee6c5;--ac2:#7aa7ff;--tx:#eaf2ff;--mu:#8ea6c6;--ok:#2ee66b;--ko:#ff5c6c}
+*{box-sizing:border-box}
+html,body{min-height:100%;margin:0;background:radial-gradient(circle at 20% 0,#12305a,#07111f 60%);color:var(--tx);font-family:Inter,Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+.w{max-width:640px;margin:0 auto;padding:18px 14px 40px}
+h1{font-family:Orbitron,Arial,sans-serif;font-size:clamp(26px,7vw,42px);margin:6px 0 0;letter-spacing:.05em;text-align:center}h1 em{font-style:normal;color:var(--ac)}
+.sub{text-align:center;color:var(--mu);font-size:13px;margin:4px 0 16px}
+.card{background:var(--cd);border:1px solid var(--ln);border-radius:16px;padding:14px;margin:10px 0}
+.lv{display:flex;align-items:center;gap:12px}.lv b{font-family:Orbitron,Arial,sans-serif;font-size:13px;color:var(--ac)}
+.bar{height:8px;background:#16294a;border-radius:4px;overflow:hidden;flex:1}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width .3s}
+h3{font-family:Orbitron,Arial,sans-serif;font-size:11px;letter-spacing:.2em;color:var(--mu);margin:18px 0 8px}
+.g{display:grid;gap:8px;grid-template-columns:repeat(2,1fr)}
+.b{border:1px solid var(--ln);border-radius:14px;padding:14px 10px;background:var(--cd);color:var(--tx);cursor:pointer;text-align:left;font:600 14px Inter,Arial;display:block;width:100%}
+.b:hover{border-color:var(--ac)}.b span{display:block;font-weight:400;font-size:11px;color:var(--mu);margin-top:3px}.b em{font-style:normal;font-size:22px;display:block;margin-bottom:4px}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mu);margin-bottom:8px}
+.q{font-size:clamp(17px,4.6vw,22px);font-weight:600;line-height:1.4;margin:14px 0}
+.o{display:block;width:100%;margin:8px 0;padding:14px;border-radius:12px;border:1px solid var(--ln);background:var(--cd);color:var(--tx);font:600 15px Inter,Arial;text-align:left;cursor:pointer}
+.o:hover{border-color:var(--ac2)}.o.ok{background:#12482b;border-color:var(--ok)}.o.ko{background:#4a1822;border-color:var(--ko)}
+.ex{background:#0c2a3b;border-left:4px solid var(--ac);border-radius:8px;padding:10px 12px;margin:12px 0;font-size:14px;line-height:1.5}
+.btn{display:inline-block;padding:13px 28px;border-radius:26px;border:0;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#04101e;font:800 14px Orbitron,Arial;letter-spacing:.1em;cursor:pointer;margin-top:10px}
+.btn.s{background:transparent;border:1px solid var(--ln);color:var(--tx)}
+.big{font-family:Orbitron,Arial,sans-serif;font-size:clamp(34px,10vw,64px);text-align:center;letter-spacing:.15em;margin:26px 0;min-height:1.2em;color:var(--ac)}
+input{width:100%;padding:14px;border-radius:12px;border:1px solid var(--ln);background:#0a1830;color:var(--tx);font:700 22px Orbitron,Arial;text-align:center;letter-spacing:.2em}
+.note{font-size:11px;color:var(--mu);text-align:center;margin-top:20px;line-height:1.6}
+.r{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--ln)}
+</style></head><body><div class="w" id="app"></div>
+<script>
+const $=s=>document.querySelector(s),app=$('#app'),R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),sh=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+const CATS={v:['🧬','Vie & Biologie'],n:['🌍','Nature & Terre'],e:['🚀','Espace & Physique'],c:['🧠','Corps & Cerveau'],h:['⚗️','Chimie']};
+const K=[
+['v','Quelle molécule porte l’information génétique ?',['L’ADN','L’ATP','L’hémoglobine','L’insuline'],0,'L’ADN contient les instructions pour fabriquer les protéines de chaque être vivant.'],
+['v','Quelle est l’unité de base de tous les êtres vivants ?',['L’organe','La cellule','L’atome','Le tissu'],1,'Tous les êtres vivants sont faits d’une ou plusieurs cellules : c’est la théorie cellulaire.'],
+['v','Quel processus permet aux plantes de fabriquer du sucre grâce à la lumière ?',['La photosynthèse','La respiration','La fermentation','La digestion'],0,'Avec la lumière, l’eau et le CO₂, les plantes produisent du sucre et libèrent de l’oxygène.'],
+['v','Qui a proposé la sélection naturelle comme moteur de l’évolution ?',['Mendel','Pasteur','Darwin','Curie'],2,'Charles Darwin (avec Alfred Wallace) : les individus les mieux adaptés se reproduisent davantage.'],
+['v','Combien de paires de chromosomes possède l’être humain ?',['21','23','46','48'],1,'23 paires, soit 46 chromosomes au total.'],
+['v','Quel organite produit l’essentiel de l’énergie (ATP) de la cellule ?',['Le noyau','La mitochondrie','Le ribosome','Le lysosome'],1,'Les mitochondries transforment les nutriments et l’oxygène en ATP, la « monnaie énergétique » de la cellule.'],
+['v','Quel groupe d’organismes est le plus abondant en nombre d’individus sur Terre ?',['Les bactéries','Les insectes','Les poissons','Les oiseaux'],0,'Les bactéries forment un nombre astronomique d’individus, présents partout : sol, eau, air et corps humain.'],
+['v','Quel est le rôle principal des globules blancs ?',['Transporter l’oxygène','Défendre contre les infections','Coaguler le sang','Digérer les graisses'],1,'Ils font partie du système immunitaire. L’oxygène, lui, est transporté par les globules rouges.'],
+['n','Quel est le plus grand océan ?',['L’Atlantique','L’Indien','Le Pacifique','L’Arctique'],2,'Le Pacifique couvre environ un tiers de la surface de la Terre.'],
+['n','Dans quelle couche de l’atmosphère se trouve la couche d’ozone ?',['La troposphère','La stratosphère','La mésosphère','L’exosphère'],1,'L’ozone stratosphérique absorbe une grande partie des rayons ultraviolets du Soleil.'],
+['n','Quel gaz est le plus abondant dans l’air ?',['L’oxygène','L’azote','Le CO₂','L’argon'],1,'L’air contient environ 78 % d’azote et 21 % d’oxygène.'],
+['n','Qu’est-ce qui provoque les saisons ?',['La distance Terre-Soleil','L’inclinaison de l’axe de la Terre','Les taches solaires','La Lune'],1,'L’axe de la Terre est incliné d’environ 23,4° : l’ensoleillement varie au cours de l’année.'],
+['n','Quel type de roche se forme par refroidissement du magma ?',['Sédimentaire','Magmatique','Métamorphique','Calcaire'],1,'Le granite et le basalte sont des roches magmatiques.'],
+['n','Que mesure l’échelle de Richter ?',['La vitesse du vent','La magnitude des séismes','La température','La pression'],1,'Elle donne l’énergie libérée par un séisme. Chaque point de plus correspond à une énergie environ 32 fois supérieure.'],
+['n','Quel est le plus grand désert chaud du monde ?',['Le Gobi','Le Sahara','Le Kalahari','Le désert d’Arabie'],1,'Le Sahara s’étend sur environ 9 millions de km².'],
+['n','Quel est le plus grand animal vivant aujourd’hui ?',['L’éléphant d’Afrique','La baleine bleue','Le requin-baleine','La girafe'],1,'La baleine bleue peut dépasser 25 m et 100 tonnes.'],
+['e','Quelle est l’étoile la plus proche de la Terre ?',['Sirius','Proxima du Centaure','Le Soleil','Alpha Centauri A'],2,'Le Soleil est à environ 150 millions de km, soit 8 minutes-lumière.'],
+['e','Quelle est la vitesse de la lumière dans le vide ?',['300 000 km/s','300 000 km/h','30 000 km/s','3 millions de km/s'],0,'Environ 299 792 km par seconde : rien ne va plus vite.'],
+['e','Qui a formulé la théorie de la relativité ?',['Newton','Einstein','Bohr','Galilée'],1,'Albert Einstein : relativité restreinte en 1905, générale en 1915.'],
+['e','Quelle force maintient les planètes en orbite autour du Soleil ?',['Le magnétisme','La gravitation','La force nucléaire','Les frottements'],1,'La gravité du Soleil courbe sans cesse la trajectoire des planètes.'],
+['e','Combien de planètes compte le système solaire ?',['7','8','9','10'],1,'8 depuis 2006 : Pluton est classée planète naine.'],
+['e','Quelle planète est la plus chaude du système solaire ?',['Mercure','Vénus','Mars','Jupiter'],1,'Vénus : son atmosphère de CO₂ crée un effet de serre extrême (environ 465 °C).'],
+['e','Que dit la formule E = mc² ?',['Masse et énergie sont équivalentes','L’énergie est égale à la vitesse','La masse dépend de la couleur','Le temps s’arrête à la vitesse du son'],0,'Une petite masse correspond à une énorme énergie : c’est le principe de l’énergie nucléaire.'],
+['e','Qu’est-ce qu’un trou noir ?',['Une étoile froide éteinte','Une région où la gravité retient même la lumière','Un vide sans matière','Une planète sombre'],1,'Au-delà de l’horizon des événements, rien ne peut s’échapper, pas même la lumière.'],
+['c','Combien de neurones contient environ le cerveau humain ?',['86 millions','86 milliards','860 milliards','8 millions'],1,'Environ 86 milliards, reliés par des milliers de milliards de connexions.'],
+['c','Quel est le plus grand organe du corps humain ?',['Le foie','La peau','Les poumons','L’intestin'],1,'La peau couvre près de 2 m² chez l’adulte.'],
+['c','Quelle région du cerveau est essentielle à la mémoire à long terme ?',['L’hippocampe','Le cervelet','Le bulbe rachidien','Le thalamus'],0,'L’hippocampe aide à fixer les nouveaux souvenirs.'],
+['c','Quelle hormone du pancréas régule la glycémie ?',['L’insuline','L’adrénaline','La mélatonine','Le cortisol'],0,'L’insuline fait entrer le glucose du sang dans les cellules.'],
+['c','Combien d’os compte le squelette d’un adulte ?',['106','206','306','406'],1,'206 os. Un bébé en a plus de 300, dont beaucoup fusionnent en grandissant.'],
+['c','À quoi sert notamment le sommeil pour le cerveau ?',['À rien de précis','À consolider la mémoire et nettoyer les déchets','À reposer seulement les yeux','À fabriquer de la graisse'],1,'Pendant le sommeil, le cerveau trie et fixe les souvenirs et élimine des déchets métaboliques.'],
+['c','Qu’est-ce qui favorise la neuroplasticité ?',['Apprendre de nouvelles compétences','Éviter toute nouveauté','Rester immobile','Sauter les repas'],0,'Apprendre, bouger et dormir renforcent les connexions entre neurones.'],
+['c','Quelle vitamine la peau fabrique-t-elle grâce au soleil ?',['A','C','D','K'],2,'La vitamine D aide à fixer le calcium dans les os.'],
+['h','Quelle est la formule chimique de l’eau ?',['H₂O','CO₂','O₂','NaCl'],0,'Une molécule d’eau = 2 atomes d’hydrogène + 1 atome d’oxygène.'],
+['h','Quel est le symbole chimique de l’or ?',['Ag','Au','Fe','Or'],1,'Au vient du latin « aurum ». Ag (argent) vient de « argentum ».'],
+['h','Quel gaz les plantes absorbent-elles pour la photosynthèse ?',['L’oxygène','Le dioxyde de carbone','L’azote','L’hélium'],1,'Elles captent le CO₂ de l’air par leurs stomates.'],
+['h','Quel est le pH d’une solution neutre, comme l’eau pure ?',['0','7','14','10'],1,'En dessous de 7 c’est acide, au-dessus c’est basique.'],
+['h','Quel est l’élément le plus abondant de l’univers ?',['L’oxygène','L’hydrogène','Le carbone','L’hélium'],1,'L’hydrogène représente environ 75 % de la matière ordinaire de l’univers.'],
+['h','Que contient le noyau d’un atome ?',['Des protons et des neutrons','Seulement des électrons','Des protons et des électrons','Des photons'],0,'Les électrons gravitent autour du noyau.'],
+['h','À quelle température l’eau bout-elle au niveau de la mer ?',['90 °C','100 °C','110 °C','120 °C'],1,'100 °C à pression normale. En altitude, elle bout plus bas.'],
+['h','Quel gaz, émis surtout par la combustion des énergies fossiles, est le principal responsable du réchauffement climatique actuel ?',['Le dioxyde de carbone','L’azote','L’argon','L’hélium'],0,'Le CO₂ retient la chaleur dans l’atmosphère.']
+].map(x=>({c:x[0],q:x[1],o:x[2],a:x[3],e:x[4]}));
+const LG=[
+{q:'Tous les chats sont des mammifères et tous les mammifères sont des animaux. Que peut-on conclure ?',o:['Tous les chats sont des animaux','Tous les animaux sont des chats','Aucun chat n’est un animal','Certains animaux ne sont pas des mammifères donc pas des chats'],a:0,e:'Raisonnement en chaîne : A ⊂ B et B ⊂ C implique A ⊂ C.'},
+{q:'Une batte et une balle coûtent 1,10 € ensemble. La batte coûte 1 € de plus que la balle. Combien coûte la balle ?',o:['0,10 €','0,05 €','0,15 €','0,01 €'],a:1,e:'Balle = x, batte = x + 1 : 2x + 1 = 1,10 donc x = 0,05 €. L’intuition répond 0,10 €, mais c’est faux.'},
+{q:'5 machines fabriquent 5 objets en 5 minutes. Combien de temps faut-il à 100 machines pour fabriquer 100 objets ?',o:['100 minutes','20 minutes','5 minutes','1 minute'],a:2,e:'Chaque machine fait 1 objet en 5 minutes : 100 machines font 100 objets en 5 minutes.'},
+{q:'Sur un lac, une tache de nénuphars double chaque jour. Elle couvre tout le lac en 48 jours. Quand couvre-t-elle la moitié du lac ?',o:['24 jours','47 jours','40 jours','1 jour'],a:1,e:'La veille de la couverture totale, elle faisait la moitié : le 47e jour.'},
+{q:'Dans une famille, chaque fille a au moins un frère. Il y a 3 filles. Combien d’enfants la famille compte-t-elle au minimum ?',o:['4','6','3','7'],a:0,e:'Les trois sœurs peuvent partager le même frère : 3 filles + 1 garçon = 4 enfants.'},
+{q:'Dans une course, tu dépasses le deuxième. Quelle est ta position ?',o:['Première','Deuxième','Troisième','Impossible à savoir'],a:1,e:'Tu prends la place de celui que tu dépasses : la deuxième.'}];
+function seq(){const t=R(0,3);let s=[],e;
+ if(t===0){const a=R(1,20),d=R(2,9);s=[...Array(6)].map((_,i)=>a+d*i);e='Suite arithmétique : on ajoute '+d+' à chaque fois.'}
+ else if(t===1){const a=R(1,4),d=R(2,3);s=[...Array(6)].map((_,i)=>a*d**i);e='Suite géométrique : on multiplie par '+d+' à chaque fois.'}
+ else if(t===2){s=[R(1,5),R(1,5)];for(let i=2;i<6;i++)s.push(s[i-1]+s[i-2]);e='Type Fibonacci : chaque nombre est la somme des deux précédents.'}
+ else{const a=R(1,5);s=[...Array(6)].map((_,i)=>(i+a)**2);e='Ce sont des carrés parfaits consécutifs.'}
+ const a=t===0?s[5]+(s[1]-s[0]):t===1?s[5]*(s[1]/s[0]):t===2?s[4]+s[5]:(Math.sqrt(s[5])+1)**2,set=new Set([a]);while(set.size<4)set.add(a+R(-6,6)||a+7);
+ return{q:'Quel nombre continue la suite ?  '+s.join(' , ')+' , ?',o:sh([...set].map(String)),a:null,ans:String(a),e}}
+function calc(){const t=R(0,2);let q,a,e;
+ if(t===0){const x=R(6,19),y=R(4,12),z=R(5,40);a=x*y+z;q=x+' × '+y+' + '+z+' = ?';e=x+' × '+y+' = '+x*y+', puis + '+z+' = '+a+'.'}
+ else if(t===1){const x=R(3,15),y=R(2,9),z=R(3,9);a=(x+y)*z;q='('+x+' + '+y+') × '+z+' = ?';e='On calcule la parenthèse d’abord : '+(x+y)+' × '+z+' = '+a+'.'}
+ else{const p=[10,20,25,50][R(0,3)],n=R(2,19)*20;a=n*p/100;q=p+' % de '+n+' = ?';e=p+' % de '+n+' = '+n+' × '+p+' / 100 = '+a+'.'}
+ const set=new Set([a]);while(set.size<4)set.add(a+R(-9,9)||a+10);return{q:'Calcul mental :  '+q,o:sh([...set].map(String)),ans:String(a),e}}
+let S={xp:0,best:0,games:0,st:{}};try{S=Object.assign(S,JSON.parse(localStorage.getItem('qiq')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('qiq',JSON.stringify(S))}catch(e){}};
+const TT=['Curieux','Explorateur','Apprenti savant','Scientifique','Chercheur','Savant','Génie'];
+const lvl=x=>Math.floor(Math.sqrt(x/60))+1;
+function home(){const L=lvl(S.xp),a=60*(L-1)**2,b=60*L**2,pc=Math.round((S.xp-a)/(b-a)*100);
+ app.innerHTML=`<h1>QI <em>QUEST</em></h1><div class="sub">Science · logique · mémoire — entraîne ton cerveau</div>
+ <div class="card"><div class="lv"><b>NIV. ${L} · ${TT[Math.min(TT.length-1,L-1)].toUpperCase()}</b><div class="bar"><i style="width:${pc}%"></i></div></div><div class="note" style="text-align:left;margin:8px 0 0">${S.xp} XP · ${S.games} parties · meilleure série : ${S.best}</div></div>
+ <h3>QUIZ DE CULTURE SCIENTIFIQUE</h3><div class="g">${Object.entries(CATS).map(([k,v])=>`<button class="b" data-c="${k}"><em>${v[0]}</em>${v[1]}<span>${S.st[k]?Math.round(S.st[k][0]/S.st[k][1]*100)+' % de réussite':'Nouveau'}</span></button>`).join('')}<button class="b" data-c="mix"><em>🎲</em>Mix surprise<span>Toutes les catégories</span></button></div>
+ <h3>ENTRAÎNEMENT DU RAISONNEMENT</h3><div class="g"><button class="b" data-c="log"><em>🔢</em>Logique & Calcul<span>Suites, calcul mental, énigmes</span></button><button class="b" data-c="mem"><em>🧩</em>Défi mémoire<span>Retiens des chiffres, de plus en plus longs</span></button></div>
+ <div class="note">Ce jeu entraîne ta culture scientifique, ta mémoire et ton raisonnement. Il ne mesure pas ton QI réel.<br>Les connaissances, le sommeil, l’exercice et la curiosité sont de vrais alliés du cerveau.</div>`;
+ app.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>start(b.dataset.c))}
+let Q=[],qi=0,sc=0,ok=0,streak=0,mx=0,tm=0,tmo=null,cat='',wrong=[];
+function start(c){cat=c;if(c==='mem')return mem();
+ if(c==='log'){Q=sh(LG).slice(0,3).map(x=>({q:x.q,o:sh(x.o),ans:x.o[x.a],e:x.e}));for(let i=0;i<3;i++)Q.push(seq());for(let i=0;i<4;i++)Q.push(calc());Q=sh(Q)}
+ else{const pool=c==='mix'?K:K.filter(x=>x.c===c);Q=sh(pool).slice(0,10).map(x=>{const o=sh(x.o.map((t,i)=>[t,i===x.a]));return{q:x.q,o:o.map(p=>p[0]),ans:x.o[x.a],e:x.e,c:x.c}})}
+ qi=0;sc=0;ok=0;streak=0;mx=0;wrong=[];show()}
+function show(){const q=Q[qi],T=cat==='log'?25:20;tm=T;
+ app.innerHTML=`<div class="top"><span>Question ${qi+1}/${Q.length}</span><span id="tt">⏱ ${T}s</span><span>Score ${sc}</span></div><div class="bar"><i id="tb" style="width:100%"></i></div><div class="q">${q.q}</div><div id="os">${q.o.map((t,i)=>`<button class="o" data-i="${i}">${t}</button>`).join('')}</div><div id="fb"></div>`;
+ app.querySelectorAll('.o').forEach(b=>b.onclick=()=>ans(b.textContent,b));
+ clearInterval(tmo);tmo=setInterval(()=>{tm-=.1;$('#tt').textContent='⏱ '+Math.ceil(tm)+'s';$('#tb').style.width=Math.max(0,tm/T*100)+'%';if(tm<=0)ans(null)},100)}
+function ans(t,btn){clearInterval(tmo);const q=Q[qi],good=t===q.ans;
+ app.querySelectorAll('.o').forEach(b=>{b.onclick=null;if(b.textContent===q.ans)b.classList.add('ok');else if(b===btn)b.classList.add('ko')});
+ const c=q.c||'l';S.st[c]=S.st[c]||[0,0];S.st[c][1]++;
+ if(good){ok++;streak++;mx=Math.max(mx,streak);sc+=100+Math.round(tm*5)+streak*10;S.st[c][0]++}else{streak=0;wrong.push(q)}
+ $('#fb').innerHTML=`<div class="ex"><b>${good?'✅ Bonne réponse !':t===null?'⏰ Temps écoulé.':'❌ Raté.'}</b> ${good?'':'Réponse : <b>'+q.ans+'</b>.<br>'}💡 ${q.e}</div><button class="btn" id="nx">${qi+1<Q.length?'SUIVANT →':'RÉSULTAT'}</button>`;
+ $('#nx').onclick=()=>{qi++;qi<Q.length?show():end()}}
+function end(){const xp=Math.round(sc/8);S.xp+=xp;S.games++;S.best=Math.max(S.best,mx);save();
+ app.innerHTML=`<h1>${ok>=Q.length*.8?'BRILLANT !':ok>=Q.length*.5?'BIEN JOUÉ !':'CONTINUE !'}</h1><div class="sub">${ok}/${Q.length} bonnes réponses · série max ${mx}</div>
+ <div class="card"><div class="r"><span>Score</span><b>${sc}</b></div><div class="r"><span>XP gagnés</span><b>+${xp}</b></div><div class="r"><span>Niveau</span><b>${lvl(S.xp)} · ${TT[Math.min(TT.length-1,lvl(S.xp)-1)]}</b></div></div>
+ ${wrong.length?`<h3>À RETENIR</h3>`+wrong.map(w=>`<div class="card"><b>${w.q}</b><div class="ex">✔ ${w.ans}<br>💡 ${w.e}</div></div>`).join(''):''}
+ <div style="text-align:center"><button class="btn" id="again">REJOUER</button> <button class="btn s" id="hm">MENU</button></div>`;
+ $('#again').onclick=()=>start(cat);$('#hm').onclick=home}
+function mem(){let n=3,lives=2,best=3;const run=()=>{const rev=n>=5&&n%2===1,d=[...Array(n)].map(()=>R(0,9)).join('');
+  app.innerHTML=`<div class="top"><span>Longueur : ${n}</span><span>Vies : ${'❤️'.repeat(lives)}</span><span>Record : ${best}</span></div><div class="sub">Mémorise les chiffres${rev?' (puis tape-les <b>à l’envers</b>)':''}</div><div class="big" id="bg">${d}</div>`;
+  setTimeout(()=>{$('#bg').textContent='? ? ?';app.insertAdjacentHTML('beforeend',`<input id="in" inputmode="numeric" autocomplete="off" placeholder="${rev?'à l’envers':'ta réponse'}"><div style="text-align:center"><button class="btn" id="go">VALIDER</button></div><div id="fb"></div>`);$('#in').focus();
+   const chk=()=>{const v=$('#in').value.replace(/\D/g,''),w=rev?[...d].reverse().join(''):d;$('#go').onclick=null;if(v===w){best=Math.max(best,n);n++;$('#fb').innerHTML='<div class="ex">✅ Exact ! On monte à '+n+' chiffres.</div>';setTimeout(run,900)}else{lives--;$('#fb').innerHTML='<div class="ex">❌ La bonne réponse était <b>'+w+'</b>.</div>';if(lives<=0)setTimeout(fin,1500);else setTimeout(run,1500)}};
+   $('#go').onclick=chk;$('#in').onkeydown=e=>{if(e.key==='Enter')chk()}},n*650+700)};
+ const fin=()=>{const xp=best*15;S.xp+=xp;S.games++;S.mem=Math.max(S.mem||0,best);save();app.innerHTML=`<h1>FIN DU DÉFI</h1><div class="sub">Tu as retenu jusqu’à <b>${best}</b> chiffres</div><div class="card"><div class="r"><span>XP gagnés</span><b>+${xp}</b></div><div class="r"><span>Meilleur record</span><b>${S.mem}</b></div></div><div class="note">Astuce : regroupe les chiffres par paquets de 2 ou 3 (le « chunking ») pour mieux retenir.</div><div style="text-align:center"><button class="btn" id="again">REJOUER</button> <button class="btn s" id="hm">MENU</button></div>`;$('#again').onclick=mem;$('#hm').onclick=home};run()}
+home();
+</script></body></html>
